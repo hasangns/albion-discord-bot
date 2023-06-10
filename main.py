@@ -19,7 +19,18 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 client = discord.Client(status='Online', activity=discord.Game(
-    name="Albion"), intents=intents)
+    name="Albion"), intents=intents, command_prefix='!')
+
+
+@client.event
+async def on_ready():
+    print("Bot has logged in as {0.user}".format(client))
+
+@client.event
+async def on_message(message):
+
+    if message.author == client.author:
+        return
 
 
 client.run(discord_token)
