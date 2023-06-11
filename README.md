@@ -1,3 +1,3 @@
 # Albion Discord Bot
 
-Here is discord bot to search players,guilds,battles and prices on albion
+Here is discord bot to make convenient convoy on Albion
