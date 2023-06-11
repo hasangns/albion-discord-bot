@@ -1,5 +1,6 @@
 import os
 import discord
+import aiohttp
 import configparser
 
 
@@ -29,8 +30,31 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    if message.author == client.author:
+    user = str(message.author.name)
+    user_message = str(message.content)
+    channel = str(message.channel)
+
+    print(user + ":" + " " + user_message + " " + "at" + " " + channel.capitalize())
+
+    if message.author == client.user:
         return
+
+    if message.content.startswith('!price'):
+        item_name = user_message[7:]
+        url = 'https://west.albion-online-data.com/api/v2/stats/Prices/' + item_name + '.json'
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                json = await response.json()
+                for i in range(len(json)):
+                    item = json[i]['item_id']
+                    city = json[i]['city']
+                    price = json[i]['sell_price_min']
+                    quality = json[i]['quality']
+                    total = item + ' ' + city + ' ' + str(price) + ' ' + str(quality)
+                    #print(total)
+                    if (int(price) != 0):
+                        embed = discord.Embed(title='Prices of' + item_name,description=price)
+                        await message.channel.send(embed=embed)
 
 
 client.run(discord_token)
