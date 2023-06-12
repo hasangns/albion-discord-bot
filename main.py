@@ -43,15 +43,20 @@ async def on_message(message):
 
     if message.content.startswith('!price'):
         item_name = user_message[7:]
-        if item_name == "":
-            await message.channel.send("Item is not exist")
-        else:
-            embed = discord.Embed(title=f"Price of {item_name}", url='https://github.com/iamgunes', description=await price(item_name))
-            embed.add_field(name="Item Name", value="> Test 1", inline=True)
-            embed.add_field(name="City", value="> Test 2", inline=True)
-            embed.add_field(name="Price", value="> Test 3", inline=True)
-            #embed.add_field(name="Quality", value="> Test 4", inline=True)
-            await message.channel.send(embed=embed)
+        results = await price(item_name)
+        n_city = ""
+        n_price = ""
+        n_quality = ""
+        for item_id, city, item_price, quality in results:
+            n_city += city + "\n"
+            n_price += str(item_price) + "\n"
+            n_quality += str(quality) + "\n"
+        embed = discord.Embed(
+            title=f"Price of {item_name}", url='https://github.com/iamgunes')
+        embed.add_field(name="Location", value=n_city, inline=True)
+        embed.add_field(name="Min Sell Price", value=n_price, inline=True)
+        embed.add_field(name="Quality", value=n_quality, inline=True)
+        await message.channel.send(embed=embed)
 
 
 client.run(discord_token)
