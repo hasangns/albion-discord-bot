@@ -1,5 +1,4 @@
 import aiohttp
-import asyncio
 
 
 async def price(item_name):
@@ -9,10 +8,15 @@ async def price(item_name):
             json_data = await response.json()
             results = []
             for item in json_data:
-                if 'item_id' in item and 'city' in item and 'sell_price_min' in item and 'quality' in item:
-                    item_id = item['item_id']
+                if 'city' in item and 'sell_price_min' in item and 'quality' in item:
                     city = item['city']
                     price = item['sell_price_min']
                     quality = item['quality']
-                    results.append((item_id, city, price, quality))
-            return results
+                    if int(price) != 0:
+                        results.append((city, price, quality))
+            if results:
+                return results
+            else:
+                return None
+
+
