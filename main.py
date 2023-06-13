@@ -2,7 +2,7 @@ import os
 import discord
 import configparser
 from price_helper import price
-from arbitrage_help import arbitrage
+from arbitrage_helper import arbitrage
 
 
 # Load config.ini
@@ -51,9 +51,9 @@ async def on_message(message):
                 n_price += str(item_price) + "\n"
                 n_quality += str(quality) + "\n"
             embed = discord.Embed(
-                title=f"Price of {item_name}", url='https://github.com/iamgunes')
+                title=f"Price Of {item_name}", url='https://github.com/iamgunes')
             embed.add_field(name="Location", value=n_city, inline=True)
-            embed.add_field(name="Min Sell Price", value=n_price, inline=True)
+            embed.add_field(name="Sell Price", value=n_price, inline=True)
             embed.add_field(name="Quality", value=n_quality, inline=True)
             await message.channel.send(embed=embed)
         else:
@@ -69,18 +69,17 @@ async def on_message(message):
             n_bm_city = ""
             n_others_city = ""
             n_profit = ""
-
-            for bm_price, others_price, others_city, profit in results:
-                #n_bm_price += str(bm_price) + "\n"
-                n_bm_city += f" Black Market - {bm_price}\n"
-                #n_others_price += str(others_price) + "\n"
-                n_others_city += f"{others_city} - {others_price}\n"
+            n_quality = ""
+            for bm_price, others_price, others_city, qualities, profit in results:
+                n_bm_city += f" Black Market - {bm_price} - {qualities}\n"
+                n_others_city += f"{others_city} - {others_price} - {qualities}\n"
                 n_profit += str(profit) + "\n"
-                print(others_city)
             embed = discord.Embed(
-                title=f"Price of {item_name}", url='https://github.com/iamgunes')
-            embed.add_field(name="Black Market Price", value=n_bm_city, inline=True)
-            embed.add_field(name="Other Cities Price", value=n_others_city, inline=True)
+                title=f"Arbitrage Of {item_name}", url='https://github.com/iamgunes')
+            embed.add_field(name="Black Market Price",
+                            value=n_bm_city, inline=True)
+            embed.add_field(name="Other Cities Price",
+                            value=n_others_city, inline=True)
             embed.add_field(name="Profit", value=n_profit, inline=True)
 
             await message.channel.send(embed=embed)
