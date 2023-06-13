@@ -61,15 +61,13 @@ async def on_message(message):
 
     if message.content.startswith('!arbitrage'):
         split = user_message.split()
-        #item_tier = split[1]
-        item_name = split[1]
-        #item_quality = split[3]
-        results = await arbitrage(item_name)
+        item_tier = split[1]
+        item_name = split[2]
+        results = await arbitrage(item_tier,item_name)
         if results != None:
             n_bm_city = ""
             n_others_city = ""
             n_profit = ""
-            n_quality = ""
             for bm_price, others_price, others_city, qualities, profit in results:
                 n_bm_city += f" Black Market - {bm_price} - {qualities}\n"
                 n_others_city += f"{others_city} - {others_price} - {qualities}\n"

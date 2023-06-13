@@ -1,8 +1,9 @@
 import aiohttp
 
 
-async def arbitrage(item_name):
-    url = 'https://west.albion-online-data.com/api/v2/stats/Prices/' + item_name + '.json'
+async def arbitrage(item_tier,item_name):
+    url = 'https://west.albion-online-data.com/api/v2/stats/Prices/' + str(item_tier).upper() + '_' + str(item_name).upper() + '.json'
+    print(url)
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             json_data = await response.json()
