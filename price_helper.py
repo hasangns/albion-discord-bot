@@ -1,35 +1,60 @@
 import aiohttp
 
+qualities = {
+    1: "Normal",
+    2: "Good",
+    3: "Outstanding",
+    4: "Excellent",
+    5: "Masterpiece"
+}
 
-async def price(item_name):
-    url = 'https://west.albion-online-data.com/api/v2/stats/Prices/' + item_name + '.json'
+
+async def check_price(item_name):
+    url = f"https://west.albion-online-data.com/api/v2/stats/Prices/{item_name}.json"
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             json_data = await response.json()
             results = []
             for item in json_data:
-                if 'city' in item and 'sell_price_min' in item and 'quality' in item:  # Check items if it is in item
+                if all(key in item for key in ('city', 'sell_price_min', 'quality')):
                     city = item['city']
                     price = item['sell_price_min']
                     quality = item['quality']
 
-                    if quality == 1:
-                        new_quality = "Normal"
-                    elif quality == 2:
-                        new_quality = "Good"
-                    elif quality == 3:
-                        new_quality = "Outstanding"
-                    elif quality == 4:
-                        new_quality = "Excellent"
-                    else:
-                        new_quality = "Masterpiece"
+                    if int(price) != 0:
+                        results.append((city, price, qualities.get(quality)))
+
+            return results if results else None
+
+
+async def check_profit(item_tier, item_name):
+    url = f"https://west.albion-online-data.com/api/v2/stats/Prices/{str(item_tier).upper()}_{str(item_name).upper()}.json"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            json_data = await response.json()
+            bm_data = []
+            others_data = []
+            results = []
+
+            for item in json_data:
+                if all(key in item for key in ('city', 'sell_price_min', 'sell_price_min_date', 'quality')):
+                    city = item['city']
+                    price = item['sell_price_min']
+                    price_date = item['sell_price_min_date']
+                    quality = item['quality']
 
                     if int(price) != 0:
-                        # Append all in
-                        results.append((city, price, new_quality))
-            if results:  # If it is not none return
-                return results
-            else:
-                return None
+                        if city == 'Black Market':
+                            bm_data.append((price, quality, price_date))
+                        else:
+                            others_data.append(
+                                (price, quality, city, price_date))
 
+            for bm_price, bm_quality, bm_date in bm_data:
+                for others_price, others_quality, others_city, others_date in others_data:
+                    if bm_quality == others_quality and bm_price - others_price > 0:
+                        profit = bm_price - others_price
+                        results.append((bm_price, others_price, others_city, qualities.get(
+                            bm_quality), profit, bm_date, others_date))
 
+            return results if results else None
