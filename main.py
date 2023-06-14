@@ -1,8 +1,7 @@
 import os
 import discord
 import configparser
-from price_helper import price
-from arbitrage_helper import arbitrage
+from price_helper import check_price, check_profit
 
 
 # Load config.ini
@@ -41,48 +40,74 @@ async def on_message(message):
     if message.content.startswith('!price'):
         split = user_message.split()
         item_name = split[1]
-        results = await price(item_name)
-        if results != None:
-            n_city = ""
-            n_price = ""
-            n_quality = ""
-            for city, item_price, quality in results:
-                n_city += city + "\n"
-                n_price += str(item_price) + "\n"
-                n_quality += str(quality) + "\n"
+        results = await check_price(item_name)
+        if results is not None:
+            location = "\n".join(
+                f"{city}"
+                for city, _, _, in results
+            )
+            sellPrice = "\n".join(
+                f"{price}"
+                for _, price, _, in results
+            )
+            qualities = "\n".join(
+                f"{qualities}"
+                for _, _, qualities in results
+            )
+
             embed = discord.Embed(
-                title=f"Price Of {item_name}", url='https://github.com/iamgunes')
-            embed.add_field(name="Location", value=n_city, inline=True)
-            embed.add_field(name="Sell Price", value=n_price, inline=True)
-            embed.add_field(name="Quality", value=n_quality, inline=True)
+                title=f"Price Of {item_name}",
+                url='https://github.com/iamgunes'
+            )
+            embed.add_field(
+                name="Location", value=location, inline=True
+            )
+            embed.add_field(
+                name="Sell Price", value=sellPrice, inline=True
+            )
+            embed.add_field(
+                name="Quality", value=qualities, inline=True
+            )
             await message.channel.send(embed=embed)
         else:
             await message.channel.send("Item price not found")
 
-    if message.content.startswith('!arbitrage'):
+    if message.content.startswith("!arbitrage"):
         split = user_message.split()
-        item_tier = split[1]
-        item_name = split[2]
-        results = await arbitrage(item_tier,item_name)
-        if results != None:
-            n_bm_city = ""
-            n_others_city = ""
-            n_profit = ""
-            for bm_price, others_price, others_city, qualities, profit in results:
-                n_bm_city += f" Black Market - {bm_price} - {qualities}\n"
-                n_others_city += f"{others_city} - {others_price} - {qualities}\n"
-                n_profit += str(profit) + "\n"
-            embed = discord.Embed(
-                title=f"Arbitrage Of {item_name}", url='https://github.com/iamgunes')
-            embed.add_field(name="Black Market Price",
-                            value=n_bm_city, inline=True)
-            embed.add_field(name="Other Cities Price",
-                            value=n_others_city, inline=True)
-            embed.add_field(name="Profit", value=n_profit, inline=True)
+        if len(split) > 2 and len(split) < 5:
+            item_tier = split[1]
+            item_name = split[2]
+            results = await check_profit(item_tier, item_name)
+            if results is not None:
+                blackMarket = "\n".join(
+                    f" Black Market - {bm_price} - {qualities} - {bm_date}"
+                    for bm_price, _, _, qualities, _, bm_date, _ in results
+                )
+                otherCities = "\n".join(
+                    f"{others_city} - {others_price} - {qualities} - {others_date}"
+                    for _, others_price, others_city, qualities, _, _, others_date in results
+                )
+                profit = "\n".join(
+                    str(profit) for _, _, _, _, profit, _, _ in results
+                )
 
-            await message.channel.send(embed=embed)
+                embed = discord.Embed(
+                    title=f"Arbitrage Of {item_name}",
+                    url='https://github.com/iamgunes'
+                )
+                embed.add_field(
+                    name="Black Market Price", value=blackMarket, inline=True
+                )
+                embed.add_field(
+                    name="Other Cities Price", value=otherCities, inline=True
+                )
+                embed.add_field(name="Profit", value=profit, inline=True)
+
+                await message.channel.send(embed=embed)
+            else:
+                await message.channel.send("Item is not profitable")
         else:
-            await message.channel.send("Item is not profitable")
+            await message.author.send("This is a wrong usage you can use like this:\n!arbitrage t4 leather")
 
 
 client.run(discord_token)
