@@ -2,6 +2,7 @@ import os
 import discord
 import configparser
 from price_helper import check_price, check_profit
+from datetime import datetime
 
 
 # Load config.ini
@@ -77,18 +78,28 @@ async def on_message(message):
         if len(split) > 2 and len(split) < 5:
             item_tier = split[1]
             item_name = split[2]
+
             results = await check_profit(item_tier, item_name)
             if results is not None:
                 blackMarket = "\n".join(
-                    f" Black Market - {bm_price} - {qualities} - {bm_date}"
-                    for bm_price, _, _, qualities, _, bm_date, _ in results
+                    f"Black Market - {bm_price} - {qualities}"
+                    for bm_price, _, _, qualities, _, _, bm_date, _ in results
                 )
                 otherCities = "\n".join(
-                    f"{others_city} - {others_price} - {qualities} - {others_date}"
-                    for _, others_price, others_city, qualities, _, _, others_date in results
+                    f"{others_city} - {others_price} - {qualities}"
+                    for _, others_price, others_city, qualities, _, _, _, others_date in results
                 )
                 profit = "\n".join(
-                    str(profit) for _, _, _, _, profit, _, _ in results
+                    f" {str(profit)}"
+                    for _, _, _, _, profit, preProfit, _, _ in results
+                )
+                blackMarketDate = "\n".join(
+                    f"{datetime.strptime(bm_date, '%Y-%m-%dT%H:%M:%S')}"
+                    for _, _, _, _, _, _, bm_date, _ in results
+                )
+                otherCitiesDate = "\n".join(
+                    f"{datetime.strptime(others_date, '%Y-%m-%dT%H:%M:%S')}"
+                    for _, _, _, _, _, _, _, others_date in results
                 )
 
                 embed = discord.Embed(
@@ -101,7 +112,18 @@ async def on_message(message):
                 embed.add_field(
                     name="Other Cities Price", value=otherCities, inline=True
                 )
-                embed.add_field(name="Profit", value=profit, inline=True)
+                embed.add_field(
+                    name="Profit", value=profit, inline=True
+                )
+                embed.add_field(
+                    name="Black Market Last Uptade", value=blackMarketDate, inline=True
+                )
+                embed.add_field(
+                    name="Other Cities Last Uptade", value=otherCitiesDate, inline=True
+                )
+                embed.add_field(
+                    name="Item Amount", value="None", inline=True
+                )
 
                 await message.channel.send(embed=embed)
             else:

@@ -53,8 +53,13 @@ async def check_profit(item_tier, item_name):
             for bm_price, bm_quality, bm_date in bm_data:
                 for others_price, others_quality, others_city, others_date in others_data:
                     if bm_quality == others_quality and bm_price - others_price > 0:
-                        profit = bm_price - others_price
-                        results.append((bm_price, others_price, others_city, qualities.get(
-                            bm_quality), profit, bm_date, others_date))
-
+                        profit = bm_price - \
+                            int((bm_price * 0.08)) - others_price
+                        preProfit = bm_price - \
+                            int((bm_price * 0.04)) - others_price
+                        if profit > 0:
+                            results.append((bm_price, others_price, others_city, qualities.get(
+                                bm_quality), profit, preProfit, bm_date, others_date))
+                        else:
+                            pass
             return results if results else None
