@@ -27,8 +27,8 @@ async def check_price(item_name):
             return results if results else None
 
 
-async def check_profit(item_tier, item_name):
-    url = f"https://west.albion-online-data.com/api/v2/stats/Prices/{str(item_tier).upper()}_{str(item_name).upper()}.json"
+async def check_profit(item_name):
+    url = f"https://west.albion-online-data.com/api/v2/stats/Prices/{item_name}.json"
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             json_data = await response.json()

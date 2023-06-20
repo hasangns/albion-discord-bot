@@ -1,8 +1,9 @@
 import os
 import discord
 import configparser
-from price_helper import check_price, check_profit
 from datetime import datetime
+from price_helper import check_price, check_profit
+from get_item_name import item_name_finder, item_id_finder
 
 
 # Load config.ini
@@ -40,8 +41,10 @@ async def on_message(message):
 
     if message.content.startswith('!price'):
         split = user_message.split()
-        item_name = split[1]
-        results = await check_price(item_name)
+        item_tier = split[1]
+        item_name = split[2]
+        total = item_tier + " " + item_name
+        results = await check_price(item_id_finder(total))
         if results is not None:
             location = "\n".join(
                 f"{city}"
@@ -57,7 +60,7 @@ async def on_message(message):
             )
 
             embed = discord.Embed(
-                title=f"Price Of {item_name}",
+                title=f"Price Of {item_name_finder(total)}",
                 url='https://github.com/iamgunes'
             )
             embed.add_field(
@@ -78,11 +81,12 @@ async def on_message(message):
         if len(split) > 2 and len(split) < 5:
             item_tier = split[1]
             item_name = split[2]
+            total = item_tier + " " + item_name
 
-            results = await check_profit(item_tier, item_name)
+            results = await check_profit(item_id_finder(total))
             if results is not None:
                 blackMarket = "\n".join(
-                    f"Black Market - {bm_price} - {qualities}"
+                    f"{bm_price} - {qualities}"
                     for bm_price, _, _, qualities, _, _, bm_date, _ in results
                 )
                 otherCities = "\n".join(
@@ -103,7 +107,7 @@ async def on_message(message):
                 )
 
                 embed = discord.Embed(
-                    title=f"Arbitrage Of {item_name}",
+                    title=f"Arbitrage Of {item_name_finder(total)}",
                     url='https://github.com/iamgunes'
                 )
                 embed.add_field(
