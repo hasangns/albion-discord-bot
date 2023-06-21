@@ -5,8 +5,17 @@ from datetime import datetime
 from price_helper import check_price, check_profit
 from get_item_name import item_name_finder, item_id_finder
 
+#Tiers
+tiers = {
+    't4': "Adept's",
+    't5': "Expert's",
+    't6': "Master's",
+    't7': "Grandmaster's",
+    't8': "Elder's"
+}
 
-# Load config.ini
+
+# Load config.iniF
 currentPath = os.path.dirname(os.path.realpath(__file__))
 configs = configparser.ConfigParser()
 configs.read(currentPath + "/config.ini")
@@ -28,7 +37,6 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-
     user = str(message.author.name)
     user_message = str(message.content)
     channel = str(message.channel)
@@ -42,6 +50,8 @@ async def on_message(message):
     if message.content.startswith('!price'):
         split = user_message.split()
         item_tier = split[1]
+        item_tier = item_tier.lower()
+        item_tier = tiers.get(item_tier, item_tier)
         item_name = split[2]
         total = item_tier + " " + item_name
         results = await check_price(item_id_finder(total))
@@ -80,6 +90,8 @@ async def on_message(message):
         split = user_message.split()
         if len(split) > 2 and len(split) < 5:
             item_tier = split[1]
+            item_tier = item_tier.lower()
+            item_tier = tiers.get(item_tier,item_tier)
             item_name = split[2]
             total = item_tier + " " + item_name
 
