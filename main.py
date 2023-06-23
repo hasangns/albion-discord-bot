@@ -5,8 +5,11 @@ from datetime import datetime
 from price_helper import check_price, check_profit
 from get_item_name import item_name_finder, item_id_finder
 
-#Tiers
+
+# Tiers
 tiers = {
+    't2': "Novice's",
+    't3': "Journeyman's",
     't4': "Adept's",
     't5': "Expert's",
     't6': "Master's",
@@ -15,7 +18,7 @@ tiers = {
 }
 
 
-# Load config.iniF
+# Load config.ini
 currentPath = os.path.dirname(os.path.realpath(__file__))
 configs = configparser.ConfigParser()
 configs.read(currentPath + "/config.ini")
@@ -30,6 +33,7 @@ client = discord.Client(status='Online', activity=discord.Game(
     name="Albion"), intents=intents)
 
 
+# Logging message
 @client.event
 async def on_ready():
     print("Bot has logged in as {0.user}".format(client))
@@ -91,11 +95,13 @@ async def on_message(message):
         if len(split) > 2 and len(split) < 5:
             item_tier = split[1]
             item_tier = item_tier.lower()
-            item_tier = tiers.get(item_tier,item_tier)
+            item_tier = tiers.get(item_tier, item_tier)
             item_name = split[2]
-            total = item_tier + " " + item_name
 
-            results = await check_profit(item_id_finder(total))
+            total = item_tier + " " + item_name
+            item_id = item_id_finder(total)
+
+            results = await check_profit(item_id)
             if results is not None:
                 blackMarket = "\n".join(
                     f"{bm_price} - {qualities}"
@@ -109,18 +115,19 @@ async def on_message(message):
                     f" {str(profit)}"
                     for _, _, _, _, profit, preProfit, _, _ in results
                 )
-                blackMarketDate = "\n".join(
+
+                # If you want to check uptade date you can unlock
+                """blackMarketDate = "\n".join(
                     f"{datetime.strptime(bm_date, '%Y-%m-%dT%H:%M:%S')}"
                     for _, _, _, _, _, _, bm_date, _ in results
-                )
-                otherCitiesDate = "\n".join(
+                )"""
+                """otherCitiesDate = "\n".join(
                     f"{datetime.strptime(others_date, '%Y-%m-%dT%H:%M:%S')}"
                     for _, _, _, _, _, _, _, others_date in results
-                )
+                )"""
 
                 embed = discord.Embed(
                     title=f"Arbitrage Of {item_name_finder(total)}",
-                    url='https://github.com/iamgunes'
                 )
                 embed.add_field(
                     name="Black Market Price", value=blackMarket, inline=True
@@ -131,12 +138,17 @@ async def on_message(message):
                 embed.add_field(
                     name="Profit", value=profit, inline=True
                 )
-                embed.add_field(
+                embed.set_thumbnail(
+                    url="https://render.albiononline.com/v1/item/" + item_id
+                )
+
+                # If you want to check uptade date you can unlock
+                """embed.add_field(
                     name="Black Market Last Uptade", value=blackMarketDate, inline=True
-                )
-                embed.add_field(
+                )"""
+                """embed.add_field(
                     name="Other Cities Last Uptade", value=otherCitiesDate, inline=True
-                )
+                )"""
                 embed.add_field(
                     name="Item Amount", value="None", inline=True
                 )
