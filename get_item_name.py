@@ -2,16 +2,18 @@ import requests
 import difflib
 
 
-
 url = 'https://raw.githubusercontent.com/ao-data/ao-bin-dumps/master/formatted/items.json'
 
 response = requests.get(url)
 data = response.json()
 
 
-
+# Determine the item id
 def item_id_finder(name):
-    matches = difflib.get_close_matches(name, [item.get('LocalizedNames', {}).get('EN-US') for item in data if item.get('LocalizedNames')], n=1, cutoff=0.6)
+
+    # Difflib to get close strings with input
+    matches = difflib.get_close_matches(name, [item.get('LocalizedNames', {}).get(
+        'EN-US') for item in data if item.get('LocalizedNames')], n=1, cutoff=0.6)
     if matches:
         matching_name = matches[0]
         for item in data:
@@ -20,8 +22,10 @@ def item_id_finder(name):
                 unique_name = item.get('UniqueName')
                 return unique_name
 
+
 def item_name_finder(name):
-    matches = difflib.get_close_matches(name, [item.get('LocalizedNames', {}).get('EN-US') for item in data if item.get('LocalizedNames')], n=1, cutoff=0.6)
+    matches = difflib.get_close_matches(name, [item.get('LocalizedNames', {}).get(
+        'EN-US') for item in data if item.get('LocalizedNames')], n=1, cutoff=0.6)
     if matches:
         matching_name = matches[0]
         for item in data:
