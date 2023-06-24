@@ -41,13 +41,6 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    user = str(message.author.name)
-    user_message = str(message.content)
-    channel = str(message.channel)
-
-    print(user + ":" + " " + user_message +
-          " " + "at" + " " + channel.capitalize())
-
     if message.author == client.user:
         return
 
@@ -125,7 +118,7 @@ async def on_message(message):
                     for _, _, _, _, profit, preProfit, _, _ in results
                 )
 
-                # If you want to check uptade date you can unlock
+                # If you want to check item uptade time you can delete the quotes
                 """blackMarketDate = "\n".join(
                     f"{datetime.strptime(bm_date, '%Y-%m-%dT%H:%M:%S')}"
                     for _, _, _, _, _, _, bm_date, _ in results
@@ -154,7 +147,7 @@ async def on_message(message):
                     text="Prices data from albion data. It is not provide live data."
                 )
 
-                # If you want to check uptade date you can unlock
+                # If you want to check item uptade time you can delete the quotes
                 """embed.add_field(
                     name="Black Market Last Uptade", value=blackMarketDate, inline=True
                 )"""
