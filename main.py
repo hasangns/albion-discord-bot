@@ -57,7 +57,10 @@ async def on_message(message):
         item_tier = item_tier.lower()
         item_tier = tiers.get(item_tier, item_tier)
         item_name = split[2]
+
         total = item_tier + " " + item_name
+        item_id = item_id_finder(total)
+
         results = await check_price(item_id_finder(total))
         if results is not None:
             location = "\n".join(
@@ -74,8 +77,7 @@ async def on_message(message):
             )
 
             embed = discord.Embed(
-                title=f"Price Of {item_name_finder(total)}",
-                url='https://github.com/iamgunes'
+                title=f"Price Of {item_name_finder(total)}"
             )
             embed.add_field(
                 name="Location", value=location, inline=True
@@ -86,6 +88,13 @@ async def on_message(message):
             embed.add_field(
                 name="Quality", value=qualities, inline=True
             )
+            embed.set_thumbnail(
+                url="https://render.albiononline.com/v1/item/" + item_id
+            )
+            embed.set_footer(
+                text="Prices data from albion data. It is not provide live data."
+            )
+
             await message.channel.send(embed=embed)
         else:
             await message.channel.send("Item price not found")
@@ -141,6 +150,9 @@ async def on_message(message):
                 embed.set_thumbnail(
                     url="https://render.albiononline.com/v1/item/" + item_id
                 )
+                embed.set_footer(
+                    text="Prices data from albion data. It is not provide live data."
+                )
 
                 # If you want to check uptade date you can unlock
                 """embed.add_field(
@@ -149,9 +161,6 @@ async def on_message(message):
                 """embed.add_field(
                     name="Other Cities Last Uptade", value=otherCitiesDate, inline=True
                 )"""
-                embed.add_field(
-                    name="Item Amount", value="None", inline=True
-                )
 
                 await message.channel.send(embed=embed)
             else:
