@@ -8,10 +8,7 @@ response = requests.get(url)
 data = response.json()
 
 
-# Determine the item id
 def item_id_finder(name):
-
-    # Difflib to get close strings with input
     matches = difflib.get_close_matches(name, [item.get('LocalizedNames', {}).get(
         'EN-US') for item in data if item.get('LocalizedNames')], n=1, cutoff=0.6)
     if matches:
