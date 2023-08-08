@@ -41,13 +41,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    user = str(message.author.name)
     user_message = str(message.content)
-    channel = str(message.channel)
-
-    print(user + ":" + " " + user_message +
-          " " + "at" + " " + channel.capitalize())
-
     if message.author == client.user:
         return
 
@@ -77,8 +71,7 @@ async def on_message(message):
             )
 
             embed = discord.Embed(
-                title=f"Price Of {item_name_finder(total)}",
-                url='https://github.com/iamgunes'
+                title=f"Price Of {item_name_finder(total)}"
             )
             embed.add_field(
                 name="Location", value=location, inline=True
@@ -145,18 +138,9 @@ async def on_message(message):
                 embed.add_field(
                     name="Profit", value=profit, inline=True
                 )
-                try:
-                    embed.add_field(
-                        name="Black Market Amount", value=open(str(item_tier_old) + str(item_name),"r").read(), inline=False
-                    )
-                except:
-                    embed.add_field(
-                        name="Black Market Amount", value="Not defined", inline=False
-                    )
                 embed.set_thumbnail(
                     url="https://render.albiononline.com/v1/item/" + item_id
                 )
-
 
                 # If you want to check uptade date you can unlock
                 """embed.add_field(
@@ -174,24 +158,5 @@ async def on_message(message):
                 await message.channel.send("Item is not profitable")
         else:
             await message.author.send("This is a wrong usage you can use like this:\n!arbitrage t4 leather")
-
-    if message.content.startswith("!add"):
-        split = user_message.split()
-        item_tier = split[1]
-        item_name = split[2]
-        item_quality = split[3]
-        item_amount = split[4]
-
-    if message.content.startswith("!add"):
-        split = user_message.split()
-        item_tier = split[1]
-        item_name = split[2]
-        item_quality = split[3]
-        item_amount = split[4]
-
-        with open(str(item_tier) + str(item_name),"a") as appendfile:
-            appendfile.write(item_tier + " " + item_name + " " + item_quality + " " + item_amount + "\n")
-            appendfile.close()
-
 
 client.run(discord_token)
